@@ -1,23 +1,23 @@
-package message
+package handler
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 type PutReq struct {
-	ID int
+	ID      int
 	Content string
-	TTL int64		// 生存时间单位秒
+	TTL     int64 // 生存时间单位秒
 }
 
 type GetReq struct {
-	ID int
-	Refresh bool	// 本次获取后是否重新刷新
+	ID      int
+	Refresh bool // 本次获取后是否重新刷新
 }
 
 type Response struct {
-	Code int
+	Code        int
 	Description string
 }
 
@@ -27,11 +27,11 @@ const (
 )
 
 const (
-	OK = 0
+	OK     = 0
 	ErrXXX = 400
 )
 
-type handler func(string)string
+type handler func(string) string
 
 var handlers map[string]handler
 
