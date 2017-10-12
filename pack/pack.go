@@ -1,8 +1,9 @@
 package pack
 
 import (
-	"encoding/binary"
 	"strings"
+
+	"encoding/binary"
 )
 
 const (

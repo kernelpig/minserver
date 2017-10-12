@@ -1,0 +1,4 @@
+waiting for connections...
+First():  put{"ID":1,"Content":"put request from client","TTL":30}
+write over:  {"Code":0,"More":""}
+EOF

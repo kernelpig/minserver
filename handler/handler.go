@@ -2,33 +2,11 @@ package handler
 
 import (
 	"fmt"
-	"strings"
-)
 
-type PutReq struct {
-	ID      int
-	Content string
-	TTL     int64 // 生存时间单位秒
-}
+	"encoding/json"
 
-type GetReq struct {
-	ID      int
-	Refresh bool // 本次获取后是否重新刷新
-}
-
-type Response struct {
-	Code        int
-	Description string
-}
-
-const (
-	actionPut = "put"
-	actionGet = "get"
-)
-
-const (
-	OK     = 0
-	ErrXXX = 400
+	"wangqingang/server/cache"
+	"wangqingang/server/proto"
 )
 
 type handler func(string) string
@@ -37,26 +15,48 @@ var handlers map[string]handler
 
 func init() {
 	handlers = make(map[string]handler)
-	handlers[actionPut] = PutHandler
-	handlers[actionGet] = GetHandler
+	handlers[proto.ActionPut] = PutHandler
+	handlers[proto.ActionGet] = GetHandler
+}
+
+func mustJson(object interface{}) string {
+	bytes, err := json.Marshal(object)
+	if err != nil {
+		return fmt.Sprintf(`{"code": %d}`, proto.ErrJsonUnmarshal)
+	}
+	return string(bytes)
 }
 
 func PutHandler(request string) string {
-	return ""
+	var req proto.PutReq
+	var res proto.NormalRes
+	if err := json.Unmarshal([]byte(request), &req); err != nil {
+		res.Code = proto.ErrJsonUnmarshal
+		return mustJson(res)
+	}
+	res.Code = proto.OK
+	return mustJson(res)
 }
 
 func GetHandler(request string) string {
-	return ""
+	var req proto.GetReq
+	var res proto.GetRes
+	if err := json.Unmarshal([]byte(request), &req); err != nil {
+		res.Code = proto.ErrJsonUnmarshal
+		return mustJson(res)
+	}
+	res.Model = cache.Store.Get(req.ID, false)
+	return mustJson(res)
 }
 
 func DefaultHandler(request string) string {
-	return ""
+	return mustJson(proto.NormalRes{Code: proto.ErrActionNotSupport})
 }
 
-func MessageProcessor(message string) {
-	action := strings.ToLower(message[:3])
+func MessageProcess(req string) string {
+	action, content := proto.Unmarshal(req)
 	if handler, ok := handlers[action]; ok {
-		response := handler(message[3:])
-		fmt.Println(response)
+		return handler(content)
 	}
+	return DefaultHandler(req)
 }

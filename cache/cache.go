@@ -1,10 +1,11 @@
 package cache
 
 import (
-	"container/heap"
 	"fmt"
 	"sync"
 	"time"
+
+	"container/heap"
 )
 
 var Store store

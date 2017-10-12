@@ -1,11 +1,12 @@
 package cache
 
 import (
-	"math/rand"
 	"sort"
 	"strconv"
 	"testing"
 	"time"
+
+	"math/rand"
 
 	"github.com/bouk/monkey"
 	"github.com/stretchr/testify/assert"
